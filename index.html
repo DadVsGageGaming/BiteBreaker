@@ -35,7 +35,7 @@
 </head>
 <body>
   <h1>🍔 Bite Breaker</h1>
-  <div class="food-title" id="foodName">🥪 PB&J</div>
+  <div class="food-title" id="foodName" onclick="countFoodClicks()">🥪 PB&J</div>
   <div>Bites: <span id="bites">0</span></div>
   <div>Bites Per Click: <span id="bpc">1</span></div>
   <div>Bites Per Second: <span id="bps">0</span></div>
@@ -51,6 +51,7 @@ let bites = 0;
 let bpc = 1;
 let bps = 0;
 let currentFood = 0;
+let foodClickCount = 0; 
 
 const foods = [
   {
