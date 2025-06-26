@@ -183,11 +183,21 @@ function buyUpgrade(fIndex, uIndex) {
   const upg = foods[fIndex].upgrades[uIndex];
   if (bites >= upg.cost) {
     bites -= upg.cost;
+
+    // Apply effect
     if (upg.type === "BPC") bpc += upg.effect;
     if (upg.type === "BPS") bps += upg.effect;
+
+    // Make effect more OP (scale up)
+    upg.effect = Math.floor(upg.effect * 1.5); // makes it stronger every time
+
+    // Make it more expensive
     upg.cost = Math.floor(upg.cost * 1.5);
+
     updateDisplay();
   }
+}
+
 }
 
 function nextFood() {
