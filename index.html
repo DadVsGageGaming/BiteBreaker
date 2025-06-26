@@ -211,6 +211,55 @@ setInterval(() => {
 }, 1000);
 
 updateDisplay();
+  // 🥚 Easter Egg 1: Konami Code Unlock - Adds Secret Food
+const konamiCode = [
+  "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown",
+  "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight",
+  "b", "a"
+];
+let konamiBuffer = [];
+
+document.addEventListener("keydown", (e) => {
+  konamiBuffer.push(e.key);
+  if (konamiBuffer.length > konamiCode.length) konamiBuffer.shift();
+  if (JSON.stringify(konamiBuffer) === JSON.stringify(konamiCode)) {
+    if (!foods.some(f => f.name === "🍳 Mystery Omelette")) {
+      foods.push({
+        name: "🍳 Mystery Omelette",
+        unlock: 0,
+        multiplier: 999,
+        upgrades: [
+          { name: "Eggsplosion", type: "BPC", cost: 1, effect: 999999 },
+          { name: "Scramble Storm", type: "BPS", cost: 10, effect: 5000000 }
+        ]
+      });
+      alert("🥚 You unlocked the secret food: 🍳 Mystery Omelette!");
+      currentFood = foods.length - 1;
+      updateDisplay();
+    }
+  }
+
+  // 🥚 Easter Egg 3: Pressing "Z" key at 0 bites
+  if ((e.key === "z" || e.key === "Z") && bites === 0) {
+    bites += 100;
+    bpc += 1;
+    alert("💫 Secret gift unlocked for starting over! +100 Bites, +1 BPC!");
+    updateDisplay();
+  }
+});
+
+// 🥚 Easter Egg 2: Click food name 50 times
+function countFoodClicks() {
+  foodClickCount++;
+  if (foodClickCount === 50) {
+    bites += 50000;
+    bpc += 50;
+    bps += 50;
+    alert("🤪 You clicked the food 50 times! Here's a mega boost!");
+    foodClickCount = 0;
+    updateDisplay();
+  }
+}
 </script>
 </body>
 </html>
