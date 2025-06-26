@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bite Breaker</title>
+  <style>
+    body {
+      background: #1a1a1a;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      font-size: 1.5em;
+      padding: 10px 20px;
+      margin: 10px;
+    }
+    .food-title {
+      font-size: 2em;
+      margin: 20px 0;
+    }
+    .upgrade {
+      background: #333;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .upgrade:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍔 Bite Breaker</h1>
+  <div class="food-title" id="foodName">🥪 PB&J</div>
+  <div>Bites: <span id="bites">0</span></div>
+  <div>Bites Per Click: <span id="bpc">1</span></div>
+  <div>Bites Per Second: <span id="bps">0</span></div>
+  <button onclick="clickBite()">BITE!</button>
+  <br>
+  <button onclick="prevFood()">⬅️</button>
+  <button onclick="nextFood()">➡️</button>
+  <h2>Upgrades</h2>
+  <div id="upgrades"></div>
+
+<script>
+let bites = 0;
+let bpc = 1;
+let bps = 0;
+let currentFood = 0;
+
+const foods = [
+  {
+    name: "🥪 PB&J",
+    unlock: 0,
+    multiplier: 1,
+    upgrades: [
+      { name: "Jelly Smelly", type: "BPC", cost: 100, effect: 10 },
+      { name: "Peanut Power Shower", type: "BPC", cost: 2000, effect: 25 },
+      { name: "Crust Crusher", type: "BPC", cost: 10000, effect: 75 },
+      { name: "Spread Ahead", type: "BPS", cost: 101000, effect: 200 },
+      { name: "Lunch Launch", type: "BPS", cost: 200000, effect: 500 },
+      { name: "Snack Stack Attack", type: "BPS", cost: 50000, effect: 1500 },
+      { name: "Meltin' Moment", type: "BPS", cost: 100000, effect: 3000 }
+    ]
+  },
+  {
+    name: "🧀 Quesadilla",
+    unlock: 500000,
+    multiplier: 5,
+    upgrades: [
+      { name: "Cheese Breeze", type: "BPC", cost: 600000, effect: 100 },
+      { name: "Grill Thrill", type: "BPC", cost: 1000000, effect: 250 },
+      { name: "Wrap Zap", type: "BPC", cost: 1500000, effect: 600 },
+      { name: "Spicy Dicey", type: "BPS", cost: 2000000, effect: 5000 },
+      { name: "Cheesequake", type: "BPS", cost: 5000000, effect: 12000 },
+      { name: "Melt Machine", type: "BPS", cost: 15000000, effect: 30000 },
+      { name: "Quesa-Laser", type: "BPS", cost: 25000000, effect: 75000 },
+    ]
+  },
+  {
+    name: "🌮 Taco",
+    unlock: 1500000,
+    multiplier: 10,
+    upgrades: [
+      { name: "Shell Yell", type: "BPC", cost: 2000000, effect: 1000 },
+      { name: "Salsa Dance", type: "BPC", cost: 5000000, effect: 2500 },
+      { name: "Taco Chomp", type: "BPC", cost: 10000000, effect: 6000 },
+      { name: "Heat Blast", type: "BPS", cost: 50000000, effect: 250000 },
+      { name: "Tortilla Thriller", type: "BPS", cost: 100000000, effect: 600000 },
+      { name: "Meat Beat", type: "BPS", cost: 250000000, effect: 1500000 },
+      { name: "Guac Shock", type: "BPS", cost: 500000000, effect: 3000000 },
+      { name: "Spicy Sky Fly", type: "BPS", cost: 750000000, effect: 6000000 },
+      { name: "TACO BELL BUTT BLAST", type: "BPS", cost: 999000000, effect: 50000000 }
+    ]
+  },
+  {
+    name: "🍗 Chicken Sandwich",
+    unlock: 1000000000,
+    multiplier: 25,
+    upgrades: [
+      { name: "Crispy Tipsy", type: "BPC", cost: 1200000000, effect: 20000 },
+      { name: "Bun Fun", type: "BPC", cost: 3000000000, effect: 50000 },
+      { name: "Cluckin' Power", type: "BPC", cost: 5000000000, effect: 120000 },
+      { name: "Golden Folden", type: "BPS", cost: 10000000000, effect: 20000000 },
+      { name: "Zinger Bringer", type: "BPS", cost: 50000000000, effect: 50000000 },
+      { name: "Pickle Overload", type: "BPS", cost: 100000000000, effect: 120000000 },
+      { name: "Buffalo Blowout", type: "BPS", cost: 200000000000, effect: 250000000 },
+      { name: "Crunch Thunder", type: "BPS", cost: 500000000000, effect: 500000000 },
+      { name: "Spicy Supreme", type: "BPS", cost: 900000000000, effect: 1000000000 },
+    ]
+  },
+  {
+    name: "🍔 Burger",
+    unlock: 1000000000000,
+    multiplier: 100,
+    upgrades: [
+      { name: "Stack Attack", type: "BPC", cost: 1200000000000, effect: 500000 },
+      { name: "Patty Power", type: "BPC", cost: 2500000000000, effect: 1200000 },
+      { name: "Sesame Slammer", type: "BPC", cost: 5000000000000, effect: 3000000 },
+      { name: "Juice Boost", type: "BPS", cost: 10000000000000, effect: 200000000 },
+      { name: "Beef Brief", type: "BPS", cost: 20000000000000, effect: 400000000 },
+      { name: "Grill Thrill XL", type: "BPS", cost: 50000000000000, effect: 1000000000 },
+      { name: "Double Trouble Drip", type: "BPS", cost: 200000000000000, effect: 2500000000 },
+      { name: "Mega Munch", type: "BPS", cost: 500000000000000, effect: 5000000000 },
+      { name: "Burgerquake", type: "BPS", cost: 900000000000000, effect: 10000000000 },
+    ]
+  },
+  {
+    name: "🍕 Pepperoni Pizza",
+    unlock: 1000000000000000,
+    multiplier: 500,
+    upgrades: [
+      { name: "Grease Release", type: "BPC", cost: 2000000000000000, effect: 1000000 },
+      { name: "Mozza Shockza", type: "BPC", cost: 5000000000000000, effect: 2500000 },
+      { name: "Slice & Dice", type: "BPC", cost: 10000000000000000, effect: 5000000 },
+      { name: "Crust Dust Burst", type: "BPS", cost: 50000000000000000, effect: 50000000000 },
+      { name: "Pizza Typhoon", type: "BPS", cost: 100000000000000000, effect: 100000000000 },
+      { name: "Pepperoni Overload", type: "BPS", cost: 250000000000000000, effect: 250000000000 },
+      { name: "Oven Blast", type: "BPS", cost: 500000000000000000, effect: 500000000000 },
+      { name: "Sauce Vortex", type: "BPS", cost: 1000000000000000000, effect: 1000000000000 },
+      { name: "Meltdown Deluxe", type: "BPS", cost: 2500000000000000000, effect: 2500000000000 },
+      { name: "Final Slice", type: "BPS", cost: 9990000000000000000, effect: 10000000000000 },
+    ]
+  }
+];
+
+function format(n) {
+  return n.toLocaleString("en-US");
+}
+
+function updateDisplay() {
+  document.getElementById("bites").innerText = format(bites);
+  document.getElementById("bpc").innerText = format(bpc);
+  document.getElementById("bps").innerText = format(bps);
+  document.getElementById("foodName").innerText = foods[currentFood].name;
+  const upgDiv = document.getElementById("upgrades");
+  upgDiv.innerHTML = "";
+  const food = foods[currentFood];
+  if (bites >= food.unlock) {
+    food.upgrades.forEach((upg, idx) => {
+      const btn = document.createElement("div");
+      btn.className = "upgrade";
+      btn.onclick = () => buyUpgrade(currentFood, idx);
+      btn.innerHTML = `<strong>${upg.name}</strong><br>Type: ${upg.type}, Effect: +${format(upg.effect)} ${upg.type}<br>Cost: ${format(upg.cost)} Bites`;
+      upgDiv.appendChild(btn);
+    });
+  } else {
+    upgDiv.innerHTML = `<p>🔒 Unlocks at ${format(food.unlock)} Bites!</p>`;
+  }
+}
+
+function clickBite() {
+  const mult = foods[currentFood].multiplier;
+  bites += bpc * mult;
+  updateDisplay();
+}
+
+function buyUpgrade(fIndex, uIndex) {
+  const upg = foods[fIndex].upgrades[uIndex];
+  if (bites >= upg.cost) {
+    bites -= upg.cost;
+    if (upg.type === "BPC") bpc += upg.effect;
+    if (upg.type === "BPS") bps += upg.effect;
+    upg.cost = Math.floor(upg.cost * 1.5);
+    updateDisplay();
+  }
+}
+
+function nextFood() {
+  if (currentFood < foods.length - 1) currentFood++;
+  updateDisplay();
+}
+
+function prevFood() {
+  if (currentFood > 0) currentFood--;
+  updateDisplay();
+}
+
+setInterval(() => {
+  bites += bps;
+  updateDisplay();
+}, 1000);
+
+updateDisplay();
+</script>
+</body>
+</html>
